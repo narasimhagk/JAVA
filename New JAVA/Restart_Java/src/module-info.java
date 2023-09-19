@@ -1,8 +1,0 @@
-/**
- * 
- */
-/**
- * 
- */
-module Restart_Java {
-}
