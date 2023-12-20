@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1a1a1a;
+            overflow: hidden;
+        }
+
+        #game-board {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background-color: #333;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .snake {
+            position: absolute;
+            display: flex;
+        }
+
+        .snake div {
+            width: 20px;
+            height: 20px;
+            background-color: #888;
+            border: 1px solid #000;
+        }
+
+        .food {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div id="game-board"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const board = document.getElementById('game-board');
+            const gridSize = 20;
+            const snake = [{ x: 2, y: 2 }];
+            let direction = 'right';
+            let food = getRandomPosition();
+
+            function getRandomPosition() {
+                const x = Math.floor(Math.random() * (board.clientWidth / gridSize)) * gridSize;
+                const y = Math.floor(Math.random() * (board.clientHeight / gridSize)) * gridSize;
+                return { x, y };
+            }
+
+            function draw() {
+                board.innerHTML = '';
+
+                // Draw Snake
+                const snakeElement = document.createElement('div');
+                snakeElement.className = 'snake';
+                snake.forEach(segment => {
+                    const div = document.createElement('div');
+                    div.style.left = `${segment.x}px`;
+                    div.style.top = `${segment.y}px`;
+                    snakeElement.appendChild(div);
+                });
+                board.appendChild(snakeElement);
+
+                // Draw Food
+                const foodElement = document.createElement('div');
+                foodElement.className = 'food';
+                foodElement.style.left = `${food.x}px`;
+                foodElement.style.top = `${food.y}px`;
+                board.appendChild(foodElement);
+            }
+
+            function move() {
+                const head = { ...snake[0] };
+
+                switch (direction) {
+                    case 'up':
+                        head.y -= gridSize;
+                        break;
+                    case 'down':
+                        head.y += gridSize;
+                        break;
+                    case 'left':
+                        head.x -= gridSize;
+                        break;
+                    case 'right':
+                        head.x += gridSize;
+                        break;
+                }
+
+                snake.unshift(head);
+
+                // Check if snake ate food
+                if (head.x === food.x && head.y === food.y) {
+                    food = getRandomPosition();
+                } else {
+                    snake.pop();
+                }
+
+                // Check for collisions
+                if (head.x < 0 || head.x >= board.clientWidth || head.y < 0 || head.y >= board.clientHeight) {
+                    alert('Game Over!');
+                    resetGame();
+                }
+
+                for (let i = 1; i < snake.length; i++) {
+                    if (head.x === snake[i].x && head.y === snake[i].y) {
+                        alert('Game Over!');
+                        resetGame();
+                    }
+                }
+
+                draw();
+            }
+
+            function resetGame() {
+                snake.length = 1;
+                snake[0] = { x: 2, y: 2 };
+                direction = 'right';
+                food = getRandomPosition();
+                draw();
+            }
+
+            document.addEventListener('keydown', (e) => {
+                switch (e.key) {
+                    case 'ArrowUp':
+                        if (direction !== 'down') direction = 'up';
+                        break;
+                    case 'ArrowDown':
+                        if (direction !== 'up') direction = 'down';
+                        break;
+                    case 'ArrowLeft':
+                        if (direction !== 'right') direction = 'left';
+                        break;
+                    case 'ArrowRight':
+                        if (direction !== 'left') direction = 'right';
+                        break;
+                }
+            });
+
+            setInterval(move, 200);
+
+            draw();
+        });
+    </script>
+</body>
+</html>
