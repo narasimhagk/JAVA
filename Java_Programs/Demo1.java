@@ -1,5 +1,5 @@
 // Demo.java
- class Demo {
+ class Demo1 {
     public static void main(String[] args) {
         Demo1.staticMethod();
     }
